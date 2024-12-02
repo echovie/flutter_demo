@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'home/home.dart';
 import 'study/study.dart';
 import 'profile/profile.dart';
+import '../providers/current_index.dart';
+import 'package:provider/provider.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -11,8 +13,6 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  int currentPageIndex = 0;
-
   final List<BottomNavigationBarItem> navigationBarList = const [
     BottomNavigationBarItem(
       icon: Icon(Icons.home),
@@ -54,26 +54,28 @@ class _IndexPageState extends State<IndexPage> {
       "body": ProfilePage(),
     }
   ];
-  
-  void switchPage(int index) {
-    setState(() {
-      currentPageIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    int currentPageIndex = context.watch<CurrentIndexProvider>().currentIndex;
 
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentPageIndex,
-        items: navigationBarList,
-        onTap: switchPage,
-        selectedItemColor: Colors.green,
-      ),
-      appBar: pages[currentPageIndex]['appBar'],
-      body: pages[currentPageIndex]['body'],
-    );
+    return Theme(
+        data: ThemeData(
+          appBarTheme: AppBarTheme.of(context).copyWith(
+            color: Colors.transparent,
+            titleTextStyle: const TextStyle(color: Colors.black),
+          ),
+        ),
+        child: Scaffold(
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: currentPageIndex,
+            items: navigationBarList,
+            onTap: (index) => context.read<CurrentIndexProvider>().changeIndex(index),
+            selectedItemColor: Colors.green,
+          ),
+          appBar: pages[currentPageIndex]['appBar'],
+          body: pages[currentPageIndex]['body'],
+        ));
   }
 }
